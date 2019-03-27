@@ -31,7 +31,37 @@ const Calendar = ({date}) => {
     }
   }
 
+  function getDataOfMonth() {
+    const delta = [6, 0, 1, 2, 3, 4, 5];
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const today = date.getDate();
+    const amount = new Date(year, month + 1 , 0).getDate();
+    const firstDelta = delta[new Date(year,month, 1).getDay()];
+    let lastDelta = new Date(year, month + 1, 0).getDay();
+    lastDelta = (lastDelta === 0) ? lastDelta : 7 - lastDelta;
+
+    const days = [];
+    let week = [];
+    for (let index = 1 - firstDelta; index <= amount + lastDelta; index++) {
+      const currMonth = (index > 0 && index <= amount);
+      const day = {
+        'class': (!currMonth) ? 'ui-datepicker-other-month' : (index === today) ? 'ui-datepicker-today' : '',
+        'day': new Date(year, month, index).getDate()
+      }
+      
+      week.push(day);
+      if (week.length === 7) {
+        days.push(week);
+        week = [];
+      } 
+    }
+
+    return days;   
+  }
+
   const dataDate = parseDate();
+  const days = getDataOfMonth();
   
   return (
     <div className="ui-datepicker">
@@ -48,6 +78,31 @@ const Calendar = ({date}) => {
           <span className="ui-datepicker-month">{ dataDate.nominative }</span>&nbsp;<span class="ui-datepicker-year">{ date.getFullYear() }</span>
         </div>
       </div>
+      <table className="ui-datepicker-calendar">
+        <colgroup>
+          <col />
+          <col />
+          <col />
+          <col />
+          <col />
+          <col className="ui-datepicker-week-end" />
+          <col className="ui-datepicker-week-end" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" title="Понедельник">Пн</th>
+            <th scope="col" title="Вторник">Вт</th>
+            <th scope="col" title="Среда">Ср</th>
+            <th scope="col" title="Четверг">Чт</th>
+            <th scope="col" title="Пятница">Пт</th>
+            <th scope="col" title="Суббота">Сб</th>
+            <th scope="col" title="Воскресенье">Вс</th>
+          </tr>
+        </thead>
+        <tbody>
+          { days.map((week, index) => <tr key ={index}>{ week.map((item, i) => <td key ={i + 1} className={item.class}>{item.day}</td>) } </tr>) }
+        </tbody>
+      </table>
   </div>
   );
 }
